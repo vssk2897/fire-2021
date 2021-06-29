@@ -109,7 +109,6 @@ class preProcessor:
 		only_files = list()
 		for datadir in fire_datadirs:
 			mypath = os.path.join(base_data_path, datadir)
-			temp_list = list()
 			for name in os.listdir(mypath):
 				match = re.match(self._get_language_switcher(language, data_env), name)
 				if match:
@@ -132,15 +131,18 @@ class preProcessor:
 			if df is None:
 				tdf = pandas.read_csv(f, sep=C.SEPERATOR)
 				tdf['category'] =  tdf['category'].str.rstrip()
-				tdf['sentence'] = tdf.apply(lambda x: self.removeRepeat(x['text']))
+				#print(f)
+				#print(tdf.columns)
+				tdf['sentence'] = tdf.apply(lambda x: self._removeRepeat(x['text']), axis=1)
 				#print(tdf['category'].value_counts())
 				df = pandas.concat([df, tdf], ignore_index=True)
 			else:
 				df = pandas.read_csv(f, sep=C.SEPERATOR)
-				print(df.columns)
-				df['sentence'] = df.apply(lambda x: self.removeRepeat(x['text']))
+				#print(df.columns)
+				df['sentence'] = df.apply(lambda x: self._removeRepeat(x['text']), axis=1)
 				df['category'] =  df['category'].str.rstrip()
-				
+			
+		#print(df.columns)
 		return df
 
 	"""
