@@ -172,19 +172,23 @@ class preProcessor:
 				df = pandas.read_csv(f, sep=C.SEPERATOR)
 				#print(df.columns)
 				col = df.columns.difference(['text'])
-				print()
 				df['category'] =  df[col[0]].str.rstrip()
 				df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
 				
 
 		return df
 
-	def prepare_language_dataset_character_test																																																					(self, path):
+	def prepare_language_dataset_character_test(self, path):
 		df = None
 		df = pandas.read_csv(path, sep=C.SEPERATOR)
 		col = df.columns.difference(['text'])
-		print()
 		df['category'] =  df[col[0]].str.rstrip()
+		df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+		return df
+
+	def prepare_language_dataset_character_test_new(self, path):
+		df = None
+		df = pandas.read_csv(path, sep=C.SEPERATOR)
 		df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
 		return df
 

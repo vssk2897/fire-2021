@@ -63,7 +63,7 @@ class feature_engg:
         if path is None:
             print("For Kannada we do not have test dataset with labels in 2020")
             return None
-        test_df = self.pre_processor.prepare_language_dataset_character(path)
+        test_df = self.pre_processor.prepare_language_dataset_character_test(path)
         test_df['char_data'] = test_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
         test_df['char_label'] = test_df.apply(lambda x: self._char_level_labels(x['category']), axis=1)
         model = self._read_char_model('{}_mapping_character_to_number.json'.format(self.language))
@@ -75,9 +75,8 @@ class feature_engg:
 
     def get_new_test_character_features(self,):
         path = self._get_new_language_switcher()
-        test_df = self.pre_processor.prepare_language_dataset_character(path)
+        test_df = self.pre_processor.prepare_language_dataset_character_test_new(path)
         test_df['char_data'] = test_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
-        test_df['char_label'] = test_df.apply(lambda x: self._char_level_labels(x['category']), axis=1)
         model = self._read_char_model('{}_mapping_character_to_number.json'.format(self.language))
         if model is not None:
             test_df['char_embedding'] = test_df.apply(lambda x: self._get_character_features(x.char_data, model=model), axis=1)
