@@ -1,4 +1,3 @@
-
 import pandas
 import numpy
 from .constants import C
@@ -64,6 +63,18 @@ class feature_engg:
         if path is None:
             print("For Kannada we do not have test dataset with labels in 2020")
             return None
+        test_df = self.pre_processor.prepare_language_dataset_character(path)
+        test_df['char_data'] = test_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
+        test_df['char_label'] = test_df.apply(lambda x: self._char_level_labels(x['category']), axis=1)
+        model = self._read_char_model('{}_mapping_character_to_number.json'.format(self.language))
+        if model is not None:
+            test_df['char_embedding'] = test_df.apply(lambda x: self._get_character_features(x.char_data, model=model), axis=1)
+
+        test_df = test_df.drop(columns=['tokenized_lines', 'char_data'])
+        return test_df
+
+    def get_new_test_character_features(self,):
+        path = self._get_new_language_switcher()
         test_df = self.pre_processor.prepare_language_dataset_character(path)
         test_df['char_data'] = test_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
         test_df['char_label'] = test_df.apply(lambda x: self._char_level_labels(x['category']), axis=1)
@@ -197,10 +208,21 @@ class feature_engg:
     
     def _get_old_language_switcher(self, language=None):
         switcher = {
-			'tamil': '/home/penna/fire-2021/data/2020-dataset/tamil_test_answer.tsv',
+			'tamil': os.path.join(os.getcwd() , 'data/2020-dataset/tamil_test_answer.tsv'),
 			'kannada': None,
-			'malayalam': '/home/penna/fire-2021/data/2020-dataset/malayalam_test_results.tsv'
+			'malayalam': os.path.join( os.getcwd(), 'data/2020-dataset/malayalam_test_results.tsv')
 		}
+        if language is not None:
+            return switcher.get(language, 'tamil')
+        return switcher.get(self.language, 'tamil')
+
+    
+    def _get_new_language_switcher(self, language=None):
+        switcher = {
+            'tamil': os.path.join(os.getcwd(), 'data/2021-dataset/tamil_sentiment_full_test_withoutlabels.tsv'),
+            'kannada': os.path.join(os.getcwd(), 'data/2021-dataset/kannada_sentiment_full_test_withoutlabels.tsv'),
+            'malayalam': os.path.join(os.getcwd(),'data/2021-dataset/Mal_sentiment_full_test_withoutlabels.tsv' )
+        }
         if language is not None:
             return switcher.get(language, 'tamil')
         return switcher.get(self.language, 'tamil')

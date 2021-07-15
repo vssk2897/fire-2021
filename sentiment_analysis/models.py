@@ -73,4 +73,4 @@ class CharacterRNN:
         return feature_engg(language=self.language).get_old_test_character_features()
     
     def get_new_test_features(self):
-        return 
+        return feature_engg(language=self.language).get_new_test_character_features()
