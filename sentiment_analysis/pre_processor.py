@@ -1,4 +1,5 @@
 import re
+from sys import path
 import numpy
 import os
 import pandas
@@ -43,7 +44,7 @@ class preProcessor:
 		"""
 		return re.sub(r'(.)\1+', r'\1\1', string)
 	
-	def parse(self, Masterdir, Datadir, filename, seperator, datacol, labelcol, labels):
+	def parse(self, path=None, Masterdir=None, Datadir=None, filename=None, seperator='\t', datacol=C.DATA_COLUMN, labelcol=C.LABEL_COLUMN, labels= C.LABELS_TAMIL):
 		"""Parses the dataset file returns the raw data along with labels
 
 		Args:
@@ -59,19 +60,30 @@ class preProcessor:
 			[list]: Return list of size two where second variable is numpy array
 		"""
     	#Reads the files and splits data into individual lines
-		f = open(Masterdir + Datadir + filename, 'r')
+		print(path)
+		if path is not None and os.path.isfile(path):
+			f = open(path, 'r')
+		else: 
+
+			f = open(Masterdir + Datadir + filename, 'r')
+		orig_lines = f.read()
+		orig_lines = orig_lines.split('\n')[1 : -1]
 		lines = f.read().lower()
-		lines = lines.lower().split('\n')[1:-1]
+		lines = lines.lower().split('\n')[1 : -1]
+		print('Number of rows {}'.format(len(lines)))
 
 		X_train = []
 		Y_train = []
-
+		orig_text = []
+		for line in orig_lines:
+			line = line.split(seperator)
+			orig_text.extend([line[0]])
 		#Processes individual lines
 		for line in lines:
 			# Seperator for the current dataset. Currently '\t'. 
 			line = line.split(seperator)
 			#Token is the function which implements basic preprocessing as mentioned in our paper
-			tokenized_lines = self.token(line[datacol])
+			tokenized_lines = self.token(line[datacol], remove_repeat=True)
 			
 			#Creates character lists
 			char_list = []
@@ -90,9 +102,9 @@ class preProcessor:
 		#Convert X-train & Y_train to a numpy array	
 		Y_train = numpy.asarray(Y_train)
 		assert(len(X_train) == Y_train.shape[0])
-		X_train = numpy.asarray(X_train)
-
-		return [X_train,Y_train]
+		#X_train = numpy.asarray(X_train)
+		print("Length of data {}".format(len(X_train)) )
+		return (orig_text ,X_train,Y_train)
 
 	def _get_language_dataset_filenames(self, masterdir=os.getcwd(), datadir=C.DATA_DIR, language='tamil', data_env='train'):
 		"""Returns the file names for the  corresponding languagedataset 
@@ -119,9 +131,9 @@ class preProcessor:
 
 	def _get_language_switcher(self, language, data_env='train'):
 		switcher = {
-			'tamil': r'(tamil)\w*({0})\w*(.tsv)'.format(data_env),
-			'kannada': r'(kannada)\w*({0})\w*(.tsv)'.format(data_env),
-			'malayalam': r"(Mal)\w*({0})\w*(.tsv)|(malayalam)\w*({1})\w*(.tsv)".format(data_env, data_env)
+			'tamil': r'(tamil).*({0}).*(.tsv)'.format(data_env),
+			'kannada': r'(kannada).*({0}).*(.tsv)'.format(data_env),
+			'malayalam': r"(Mal).*({0}).*(.tsv)|(malayalam).*({1}).*(.tsv)".format(data_env, data_env)
 		}
 		return switcher.get(language, 'tamil')
 	
@@ -144,6 +156,38 @@ class preProcessor:
 			
 		#print(df.columns)
 		return df
+
+	def prepare_language_dataset_character(self, language='tamil', env='train') :
+		df = None
+		for f in self._get_language_dataset_filenames(masterdir=C.MASTER_DIR, datadir=C.DATA_DIR, language=language, data_env=env):
+			if df is not None:
+				tdf = pandas.read_csv(f, sep=C.SEPERATOR)
+				col = tdf.columns.difference(['text'])
+				tdf['category'] =  tdf[col[0]].str.rstrip()
+				#tdf['category'] =  tdf['category'].str.rstrip()
+				tdf['tokenized_lines'] = tdf.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+				#print(tdf['category'].value_counts())
+				df = pandas.concat([df, tdf], ignore_index=True)
+			else:
+				df = pandas.read_csv(f, sep=C.SEPERATOR)
+				#print(df.columns)
+				col = df.columns.difference(['text'])
+				print()
+				df['category'] =  df[col[0]].str.rstrip()
+				df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+				
+
+		return df
+
+	def prepare_language_dataset_character_test(self, path):
+		df = None
+		df = pandas.read_csv(path, sep=C.SEPERATOR)
+		col = df.columns.difference(['text'])
+		print()
+		df['category'] =  df[col[0]].str.rstrip()
+		df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+		return df
+
 
 	"""
 	def pre_process_language(self, language='tamil'):
