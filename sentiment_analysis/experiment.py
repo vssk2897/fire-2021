@@ -84,6 +84,7 @@ class CharRNNExperiment :
             y_test_pred = model.predict_classes(X_test)
             test_df['sentiments'] = pandas.Series(y_test_pred)
             self._save_final_results(test_df=test_df)
+            
 
             
     def _save_final_results(self, test_df, tag, Masterdir = os.getcwd(), Experimentdir = C.EXPERIMENT_DIR):
