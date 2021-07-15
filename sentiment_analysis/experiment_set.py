@@ -13,16 +13,16 @@ class CharRNNExperimentSet :
     
     def _run_experiment_language(self, language) :
         fe = feature_engg(language=language)
-        filter_length = [2, 3, 5, 6]
+        filter_length = [ 3, 6]
         embedding_size = 256
-        lstm_output_size= [512, 256, 128, 64]
+        lstm_output_size= [512, 256, 128]
         (tdf, vdf) = fe.generate_character_embedding()
         for fil_len in filter_length:
             for lstm_out_size in lstm_output_size:
                 experiment = CharRNNExperiment(filter_length=fil_len, embedding_size=embedding_size,\
                     pool_length=fil_len, lstm_output_size=lstm_out_size)
                 experiment.run(tdf=tdf, vdf=vdf, language=language)
-                time.sleep(100)
+                time.sleep(180)
     
     def run_sample_experiments(self) :
         filter_len = 6

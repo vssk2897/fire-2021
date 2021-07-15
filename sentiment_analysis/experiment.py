@@ -39,7 +39,7 @@ class CharRNNExperiment :
         tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name, self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
         RNN = CharacterRNN(language=language, max_features=max_features, embedding_size=self.embedding_size,\
             filter_length=self.filter_length, nb_filter=self.embedding_size, pool_length=self.filter_length,\
-                lstm_output_size=self.lstm_output_size, epochs=1, maxlen=maxlen, batch_size=1024)
+                lstm_output_size=self.lstm_output_size, epochs=25, maxlen=maxlen, batch_size=256)
 
         model = None
         
