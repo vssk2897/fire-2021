@@ -10,6 +10,8 @@ from keras.layers.embeddings import Embedding
 from keras.layers.recurrent import LSTM, GRU
 from keras.layers.convolutional import Convolution1D, MaxPooling1D
 from keras.utils import np_utils
+from keras.callbacks import LambdaCallback
+import time
 
 from .constants import C
 from .extract_features import feature_engg
@@ -46,8 +48,8 @@ class CharacterRNN:
 							activation='relu',
 							strides=1))
         model.add(MaxPooling1D(pool_size=self.pool_length))
-        model.add(LSTM(units=self.lstm_output_size, dropout=0.1, recurrent_dropout=0.2, return_sequences=True))
-        model.add(LSTM(units=self.lstm_output_size, dropout=0.1, recurrent_dropout=0.2, return_sequences=False))
+        model.add(LSTM(units=self.lstm_output_size, dropout=0.1, recurrent_dropout=0.1, return_sequences=True))
+        model.add(LSTM(units=self.lstm_output_size, dropout=0.1, recurrent_dropout=0.1, return_sequences=False))
         model.add(Dense(self.numclasses))
         model.add(Activation('softmax'))
         # Optimizer is Adamax along with categorical crossentropy loss
@@ -61,7 +63,8 @@ class CharacterRNN:
 			  batch_size=self.batch_size, 
 			  shuffle=True, 
 			  epochs=self.number_of_epochs,
-			  validation_data=(X_valid, y_valid))
+			  validation_data=(X_valid, y_valid),
+              callbacks=[LambdaCallback(on_epoch_begin =  lambda e, l: time.sleep(20) ) ])
         
         return model
 
@@ -69,3 +72,5 @@ class CharacterRNN:
     def get_old_test_features(self):
         return feature_engg(language=self.language).get_old_test_character_features()
     
+    def get_new_test_features(self):
+        return 
