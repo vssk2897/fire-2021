@@ -53,16 +53,18 @@ class CharRNNExperiment :
             path = os.path.join(base_path, tag+'.h5')
             model = load_model(path)
 
-        elif v2:
-            base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR, tag)
+        elif v2:  
             old_tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name, self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
+            base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR, old_tag)
             path = os.path.join(base_path, old_tag+'.h5')
             model = load_model(path)
-            model.fit(X_train, y_train, 
+            y_train_keras = np_utils.to_categorical(y_train, C.NUM_OF_CLASSES)
+            y_valid_keras = np_utils.to_categorical(y_valid, C.NUM_OF_CLASSES)
+            model.fit(deepcopy(X_train), deepcopy(y_train_keras), 
 			  batch_size=batch_size, 
 			  shuffle=True, 
 			  epochs=epochs,
-                          validation_data=(X_valid, y_valid),callbacks=[LambdaCallback(on_epoch_end =  lambda epoch, logs:  time.sleep(10) ) ] )
+                          validation_data=(deepcopy(X_valid), deepcopy(y_valid_keras)),callbacks=[LambdaCallback(on_epoch_end =  lambda epoch, logs:  time.sleep(10) ) ] )
             
             self._save_model(model, tag)
 
