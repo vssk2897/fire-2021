@@ -38,10 +38,10 @@ class CharRNNExperimentSet :
             del fe
             # tag format [language, self.name + '-v2', self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length]
             params = tag.split('_')
-            filter_length = params[2]
-            embedding_size = params[3]
-            lstm_output_size = params[4]
-            pool_length = params[5]
+            filter_length = int(params[2])
+            embedding_size = int(params[3])
+            lstm_output_size = int(params[4])
+            pool_length = int(params[5])
             experiment = CharRNNExperiment(filter_length=filter_length, embedding_size=embedding_size, pool_length=pool_length, lstm_output_size=lstm_output_size)
             experiment.run(tdf = v2_df, vdf=v2_df, language=language, epochs=15, v2=True, batch_size=64)
 

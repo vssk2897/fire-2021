@@ -86,8 +86,9 @@ class feature_engg:
 
     def get_v2_features(self, ):
         paths = self._get_v2_switcher()
-        v2_df = self.pre_processor.prepare_language_v2_dataset(paths)
+        v2_df = self.pre_processor.prepare_language_v2_dataset(paths, self.language)
         v2_df['char_data'] = v2_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
+        v2_df['char_label'] = v2_df.apply(lambda x: self._char_level_labels(x['category']), axis=1)
         model = self._read_char_model('{}_mapping_character_to_number.json'.format(self.language))
         if model is not None:
             v2_df['char_embedding'] = v2_df.apply(lambda x: self._get_character_features(x.char_data, model=model), axis=1)

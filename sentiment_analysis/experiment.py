@@ -51,6 +51,14 @@ class CharRNNExperiment :
             path = os.path.join(base_path, tag+'.h5')
             model = load_model(path)
 
+        elif v2:
+            base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR, tag)
+            
+            path = os.path.join(base_path, tag+'.h5')
+            model = load_model(path)
+            
+
+
         else :
             print("Starting training of the Char RNN model with tag {}".format(tag))
             model = RNN.train(deepcopy(X_train), deepcopy(y_train),deepcopy(X_valid),deepcopy(y_valid))
