@@ -9,6 +9,8 @@ from copy import deepcopy
 from keras.preprocessing import sequence
 from keras.utils import np_utils
 from keras.models import load_model
+from tensorflow.keras.callbacks import LambdaCallback
+import time
 from sklearn.metrics import multilabel_confusion_matrix, balanced_accuracy_score, accuracy_score, roc_auc_score
 
 class CharRNNExperiment :
@@ -53,10 +55,16 @@ class CharRNNExperiment :
 
         elif v2:
             base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR, tag)
-            
-            path = os.path.join(base_path, tag+'.h5')
+            old_tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name, self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
+            path = os.path.join(base_path, old_tag+'.h5')
             model = load_model(path)
+            model.fit(X_train, y_train, 
+			  batch_size=batch_size, 
+			  shuffle=True, 
+			  epochs=epochs,
+                          validation_data=(X_valid, y_valid),callbacks=[LambdaCallback(on_epoch_end =  lambda epoch, logs:  time.sleep(10) ) ] )
             
+            self._save_model(model, tag)
 
 
         else :
