@@ -1,0 +1,12 @@
+language,tag
+kannada,kannada_char-rnn_7_256_512_7
+kannada,kannada_char-rnn_6_256_512_6
+kannada,kannada_char-rnn_5_256_512_5
+malayalam,malayalam_char-rnn_7_256_512_7
+malayalam,malayalam_char-rnn_7_256_128_7
+malayalam,malayalam_char-rnn_6_256_256_6
+malayalam,malayalam_char-rnn_7_256_256_7
+tamil,tamil_char-rnn_7_256_512_7
+tamil,tamil_char-rnn_7_256_256_7
+tamil,tamil_char-rnn_6_256_512_6
+tamil,tamil_char-rnn_6_256_128_6

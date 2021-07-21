@@ -18,6 +18,7 @@ class CharRNNExperimentSet :
         embedding_size = 256
         lstm_output_size= [512, 256, 128]
         (tdf, vdf) = fe.generate_character_embedding()
+        del fe
         tdf = pandas.concat([tdf, vdf], ignore_index=True)
         count = 0
         for fil_len in filter_length:
@@ -28,6 +29,22 @@ class CharRNNExperimentSet :
                 print("Sleeping for a minute !!!!")
                 time.sleep(60)
     
+    def run_v2_experiments(self, path) :
+        experiment_list = pandas.read_csv(path).values.tolist()
+
+        for [language, tag] in experiment_list:
+            fe = feature_engg(language=language)
+            v2_df = fe.get_v2_features()
+            del fe
+            # tag format [language, self.name + '-v2', self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length]
+            params = tag.split('_')
+            filter_length = params[2]
+            embedding_size = params[3]
+            lstm_output_size = params[4]
+            pool_length = params[5]
+            experiment = CharRNNExperiment(filter_length=filter_length, embedding_size=embedding_size, pool_length=pool_length, lstm_output_size=lstm_output_size)
+            experiment.run(tdf = v2_df, vdf=v2_df, language=language, epochs=15, v2=True, batch_size=64)
+
     def run_sample_experiments(self) :
         filter_len = 6
         embedding_size = 256

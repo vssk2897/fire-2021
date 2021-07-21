@@ -20,7 +20,7 @@ class CharRNNExperiment :
         self.lstm_output_size= lstm_output_size
         self.name = 'char-rnn'
 
-    def run(self, tdf, vdf, language='tamil'):
+    def run(self, tdf, vdf, language='tamil', v2=False, epochs=40, batch_size=256):
         
         columns = ['name','language' ,'tag', 'env', 'accuracy', 'balanced_accuracy' , 'multiclass_confusion_matrix']
         name = 'char-rnn'
@@ -35,16 +35,19 @@ class CharRNNExperiment :
         y_train = tdf['char_label'].values[:]
         X_valid = sequence.pad_sequences(vdf['char_embedding'].values[:], maxlen=self.embedding_size)
         y_valid = vdf['char_label'].values[:]
-        
-        tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name, self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
+        if v2:
+            tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name + '-v2', self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
+        else:
+            tag = '{0}_{1}_{2}_{3}_{4}_{5}'.format(language, self.name, self.filter_length, self.embedding_size, self.lstm_output_size, self.pool_length)
         RNN = CharacterRNN(language=language, max_features=max_features, embedding_size=self.embedding_size,\
             filter_length=self.filter_length, nb_filter=self.embedding_size, pool_length=self.filter_length,\
-                lstm_output_size=self.lstm_output_size, epochs=40, maxlen=maxlen, batch_size=256)
+                lstm_output_size=self.lstm_output_size, epochs=epochs, maxlen=maxlen, batch_size=batch_size)
 
         model = None
         
-        if self._is_model(tag):
-            base_path = os.path.join(os.getcwd(), C.EXPERIMENT_DIR, tag)
+
+        if self._is_model(tag) and not v2:
+            base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR, tag)
             path = os.path.join(base_path, tag+'.h5')
             model = load_model(path)
 
@@ -110,12 +113,16 @@ class CharRNNExperiment :
     def _save_final_results(self, test_df, tag, Masterdir = os.getcwd(), Experimentdir = C.EXPERIMENT_DIR):
         base_path = os.path.join(Masterdir, Experimentdir, tag)
         data_path = os.path.join(base_path, tag + '_results'+'.tsv')
+        if os.path.isfile(data_path):
+            data_path = os.path.join(base_path, tag + '_v2'+ '_results'+'.tsv')
         print('Saving results for the language for tag {}'.format(tag, data_path)) 
         test_df.to_csv(data_path, index=False, sep=C.SEPERATOR)
 
     def _save_eval_data(self, eval_df, tag, Masterdir = os.getcwd(), Experimentdir = C.EXPERIMENT_DIR):
         base_path = os.path.join(Masterdir, Experimentdir, tag)
         data_path = os.path.join(base_path, tag +'_eval' +'.tsv')
+        if os.path.isfile(data_path):
+            data_path = os.path.join(base_path, tag + '_v2'+ '_eval' +'.tsv')
         print('Saving evaluation data for tag {}  in the data path {}'.format(tag, data_path))
         eval_df.to_csv(data_path, index=False, sep=C.SEPERATOR)
 

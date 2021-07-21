@@ -84,6 +84,17 @@ class feature_engg:
         test_df = test_df.drop(columns=['tokenized_lines', 'char_data'])
         return test_df
 
+    def get_v2_features(self, ):
+        paths = self._get_v2_switcher()
+        v2_df = self.pre_processor.prepare_language_v2_dataset(paths)
+        v2_df['char_data'] = v2_df.apply(lambda x: self._convert_into_character_array(x['tokenized_lines']), axis=1)
+        model = self._read_char_model('{}_mapping_character_to_number.json'.format(self.language))
+        if model is not None:
+            v2_df['char_embedding'] = v2_df.apply(lambda x: self._get_character_features(x.char_data, model=model), axis=1)
+
+        v2_df = v2_df.drop(columns=['tokenized_lines', 'char_data'])
+        return v2_df
+
 
 
     def _get_filename(self):
@@ -218,9 +229,25 @@ class feature_engg:
     
     def _get_new_language_switcher(self, language=None):
         switcher = {
-            'tamil': os.path.join(os.getcwd(), 'data/2021-dataset/tamil_sentiment_full_test_withoutlabels.tsv'),
-            'kannada': os.path.join(os.getcwd(), 'data/2021-dataset/kannada_sentiment_full_test_withoutlabels.tsv'),
-            'malayalam': os.path.join(os.getcwd(),'data/2021-dataset/Mal_sentiment_full_test_withoutlabels.tsv' )
+            'tamil': os.path.join(C.MASTER_DIR, 'data/2021-dataset/tamil_sentiment_full_test_withoutlabels.tsv'),
+            'kannada': os.path.join(C.MASTER_DIR, 'data/2021-dataset/kannada_sentiment_full_test_withoutlabels.tsv'),
+            'malayalam': os.path.join(C.MASTER_DIR,'data/2021-dataset/Mal_sentiment_full_test_withoutlabels.tsv' )
+        }
+        if language is not None:
+            return switcher.get(language, 'tamil')
+        return switcher.get(self.language, 'tamil')
+
+    
+    def _get_v2_switcher(self, language=None):
+        switcher = {
+            'tamil': [os.path.join(C.MASTER_DIR, 'data/2021-dataset/tamil_sentiment_full_train.tsv'),\
+                os.path.join(C.MASTER_DIR, 'data/2021-dataset/tamil_sentiment_full_dev.tsv'),\
+                    os.path.join(C.MASTER_DIR, 'data/2020-dataset/tamil_test_answer.tsv')],
+            'kannada': [os.path.join(C.MASTER_DIR, 'data/2021-dataset/kannada_sentiment_full_train.tsv'),\
+                os.path.join(C.MASTER_DIR, 'data/2021-dataset/kannada_sentiment_full_dev.tsv')],
+            'malayalam': [os.path.join(C.MASTER_DIR, 'data/2021-dataset/Mal_sentiment_full_train.tsv'),\
+                os.path.join(C.MASTER_DIR, 'data/2021-dataset/Mal_sentiment_full_dev.tsv'),\
+                    os.path.join(C.MASTER_DIR, 'data/2020-dataset/malayalam_test_results.tsv')]
         }
         if language is not None:
             return switcher.get(language, 'tamil')

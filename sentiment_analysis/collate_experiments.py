@@ -10,7 +10,7 @@ class collate_experiments:
 
     def get_results(self):
         df = pandas.DataFrame()
-        base_path = os.path.join(os.getcwd(), C.EXPERIMENT_DIR)
+        base_path = os.path.join(C.MASTER_DIR, C.EXPERIMENT_DIR)
         for root, dirs, files in os.walk(base_path):
             if len(files) != 0:
                 for file in files:

@@ -192,6 +192,47 @@ class preProcessor:
 		df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
 		return df
 
+	def prepare_language_v2_dataset(self, paths, language):
+		
+		df = pandas.DataFrame()
+		if language != 'kannada':
+			for i in range(0, len(paths)-1 ):
+				if df.empty:
+					df = pandas.read_csv(paths[i], sep=C.SEPERATOR)
+					col = df.columns.difference(['text'])
+					df['category'] =  df[col[0]].str.rstrip()
+					#tdf['category'] =  tdf['category'].str.rstrip()
+					df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+				else:
+					tdf = pandas.read_csv(paths[i], sep=C.SEPERATOR)
+					col = tdf.columns.difference(['text'])
+					tdf['category'] =  tdf[col[0]].str.rstrip()
+					#tdf['category'] =  tdf['category'].str.rstrip()
+					tdf['tokenized_lines'] = tdf.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+					df = pandas.concat([df, tdf], ignore_index=True)
+					del tdf
+			df = pandas.concat([df, self.prepare_language_dataset_character_test(path = paths[-1])])
+
+		else :
+			for i in range(0, len(paths)-1 ):
+				if df.empty:
+					df = pandas.read_csv(paths[i], sep=C.SEPERATOR)
+					col = df.columns.difference(['text'])
+					df['category'] =  df[col[0]].str.rstrip()
+					#tdf['category'] =  tdf['category'].str.rstrip()
+					df['tokenized_lines'] = df.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+				else:
+					tdf = pandas.read_csv(paths[i], sep=C.SEPERATOR)
+					col = tdf.columns.difference(['text'])
+					tdf['category'] =  tdf[col[0]].str.rstrip()
+					#tdf['category'] =  tdf['category'].str.rstrip()
+					tdf['tokenized_lines'] = tdf.apply(lambda x: self.token(x['text'], remove_repeat=True), axis=1)
+					df = pandas.concat([df, tdf], ignore_index=True)
+					del tdf
+
+
+		return df
+
 
 	"""
 	def pre_process_language(self, language='tamil'):

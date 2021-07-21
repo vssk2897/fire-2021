@@ -63,7 +63,7 @@ class CharacterRNN:
 			  batch_size=self.batch_size, 
 			  shuffle=True, 
 			  epochs=self.number_of_epochs,
-                          validation_data=(X_valid, y_valid),callbacks=[LambdaCallback(on_epoch_end =  lambda epoch, logs:  time.sleep(15) ) ] )
+                          validation_data=(X_valid, y_valid),callbacks=[LambdaCallback(on_epoch_end =  lambda epoch, logs:  time.sleep(10) ) ] )
         
         return model
 
